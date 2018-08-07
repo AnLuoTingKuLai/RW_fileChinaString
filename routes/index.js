@@ -27,40 +27,36 @@ router.get('/', function (req, res, next) {
 //根据规则读写页面文件
 class getFileData {
   constructor() {
-    this.filePath = "../public/"; //文件路径
-    this.fileType = ['js']; //需要的值， 默认不传
-    this.writeFileData = ''; //最后返回的值
+    this.filePath = "D:\\LDXM\\code2018\\itas_vue_svn\\src\\view"; //文件路径
+    this.fileType = []; //需要的值， 默认不传
+    this.writeFileData = []; //最后返回的值
     this.init();
   }
   init(){
     //需要写入的文件流
-    let returnData = [];
-    let writeFileData = this.fileDisplay(path.join(__dirname, this.filePath), returnData, this.fileType);
-    //写入文件
-    console.log('writeFileData', writeFileData);
+    console.log(this.filePath)
+    this.fileDisplay(this.filePath);
     //数组去重
-    writeFileData = [... new Set(writeFileData)];
+    this.writeFileData = [... new Set(this.writeFileData)];
     //写入文件
-    fs.writeFileSync('./doc/message.json', `{\r${writeFileData.join('\r')}\r}`);
-    //存储数据返回给页面
-    this.writeFileData =  writeFileData;
+    fs.writeFileSync('./doc/message.json', `{\r${this.writeFileData.join('\r')}\r}`);
   }
   /**
  * 文件遍历方法
  * @param filePath 需要遍历的文件路径
  * @return [] 文件需要写入的内容
  */
-  fileDisplay(filePath, returnData, fileType = []) {
+  fileDisplay(filePath) {
     //根据文件路径读取文件，返回文件列表
     let files = fs.readdirSync(filePath);
     //遍历读取到的文件列表
     files.forEach(filename => {
       //如果用户传输了类型 那么就判断是否是这个类型的
       let flage = true;
-      if (fileType && fileType.length) {
+      if (this.fileType && this.fileType.length) {
         //获取类型
         let isfileType = filename.split('.')[filename.split('.').length - 1];
-        flage = fileType.includes(isfileType);
+        flage = this.fileType.includes(isfileType);
       }
       //获取当前文件的绝对路径
       var filedir = path.join(filePath, filename);
@@ -72,15 +68,15 @@ class getFileData {
         let fileData = this.getFile(filedir);
         //如果返回的有数据 并且数据有长度的话
         if (fileData && fileData.length) {
-          returnData.push(...fileData);
+          this.writeFileData.push(...fileData);
         }
       }
       if (isDir) { //文件夹 回调自身
-        this.fileDisplay(filedir, returnData, fileType);//递归，如果是文件夹，就继续遍历该文件夹下面的文件
+        this.fileDisplay(filedir);//递归，如果是文件夹，就继续遍历该文件夹下面的文件
       }
     });
     //返回最后的结果
-    return returnData;
+    // return returnData;
   }
 
   /**
@@ -109,7 +105,7 @@ class getFileData {
     let returnData = [];
     //数据去空，斌且按格式来
     fileData = fileData.filter(res => res).map(res => `${res}: ${res}`);
-    returnData.push(fileData);
+    returnData.push(...fileData);
     //返回数据 格式化后的数据
     return returnData
   }
