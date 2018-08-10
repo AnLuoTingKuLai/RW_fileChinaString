@@ -27,7 +27,7 @@ router.get('/', function (req, res, next) {
 //根据规则读写页面文件
 class getFileData {
   constructor() {
-    this.filePath = "D:\\LDXM\\code2018\\itas_vue_svn\\src\\view"; //文件路径
+    this.filePath = path.join(__dirname, "../public/"); //文件路径
     this.fileType = []; //需要的值， 默认不传
     this.writeFileData = []; //最后返回的值
     this.init();
