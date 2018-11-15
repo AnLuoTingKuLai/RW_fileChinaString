@@ -27,9 +27,10 @@ router.get('/', function (req, res, next) {
 //根据规则读写页面文件
 class getFileData {
   constructor() {
-    this.filePath = path.join(__dirname, "../public/"); //文件路径
+    this.filePath = 'E:/JWXM/rdf-uc-frontend/src/views/main/'; //文件路径
     this.fileType = []; //需要的值， 默认不传
     this.writeFileData = []; //最后返回的值
+    this.filterFile = ['mock', 'languageManage'] // 過濾文件夾
     this.init();
   }
   init(){
@@ -72,6 +73,15 @@ class getFileData {
         }
       }
       if (isDir) { //文件夹 回调自身
+        //要是文件的名字在列表中那麽跳過
+        console.log('filename:', filename)
+        if (filename == 'mock') {
+          console.log(999)
+        }
+        if (this.filterFile.includes(filename) ) {
+          console.log('filename:', filename)
+          return
+        }
         this.fileDisplay(filedir);//递归，如果是文件夹，就继续遍历该文件夹下面的文件
       }
     });
@@ -92,8 +102,10 @@ class getFileData {
   //最后的数据转换
   dataTransference(str) {
     let fileData = str.toString();
+    // 去html備注
+    fileData = fileData.replace(/<!--.*?-->/g, "")
     // 去备注
-    let reg = /("([^\\\"]*(\\.)?)*")|('([^\\\']*(\\.)?)*')|(\/{2,}.*?(\r|\n|$))|(\/\*(\n|.)*?\*\/)/g;
+    let reg = /("([^\\\"]*(\\.)?)*")|('([^\\\']*(\\.)?)*')|(\/{2,}.*?(\r|\n|$))|(\/\*(\n|.)*?\*\/)|/g;
     fileData = fileData.replace(reg, function (word) {
       // 去除注释后的文本 
       return /^\/{2,}/.test(word) || /^\/\*/.test(word) ? "" : word;
@@ -104,7 +116,7 @@ class getFileData {
     //数据组装
     let returnData = [];
     //数据去空，斌且按格式来
-    fileData = fileData.filter(res => res).map(res => `${res}: ${res}`);
+    fileData = fileData.filter(res => res).map(res => `${res}<br>`);
     returnData.push(...fileData);
     //返回数据 格式化后的数据
     return returnData
